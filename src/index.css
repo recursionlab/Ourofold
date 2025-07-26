@@ -2,39 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* OuroFold Design System - Cosmic Recursive Theme
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Cosmic depth colors */
+    --background: 240 15% 8%;
+    --foreground: 240 15% 95%;
+    
+    /* Primary cosmic purple */
+    --primary: 270 70% 60%;
+    --primary-glow: 280 80% 70%;
+    --primary-deep: 265 60% 45%;
+    
+    /* Spiral depth gradients */
+    --gradient-cosmic: linear-gradient(135deg, hsl(270 70% 60%), hsl(240 80% 50%));
+    --gradient-depth: linear-gradient(180deg, hsl(240 15% 8%), hsl(240 25% 12%));
+    --gradient-fold: linear-gradient(45deg, hsl(280 50% 20%), hsl(260 60% 25%));
+    
+    /* Recursive shadows and glows */
+    --shadow-fold: 0 8px 32px hsl(270 70% 60% / 0.3);
+    --shadow-depth: 0 4px 20px hsl(240 80% 50% / 0.2);
+    --glow-idea: 0 0 20px hsl(var(--primary-glow) / 0.4);
+    
+    /* Smooth transitions */
+    --transition-fold: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-spiral: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --background: 240 15% 8%;
+    --foreground: 240 15% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --card: 240 25% 12%;
+    --card-foreground: 240 15% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --popover: 240 25% 12%;
+    --popover-foreground: 240 15% 95%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 270 70% 60%;
+    --primary-foreground: 240 15% 8%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 260 60% 25%;
+    --secondary-foreground: 240 15% 95%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 240 20% 15%;
+    --muted-foreground: 240 10% 70%;
+
+    --accent: 280 50% 20%;
+    --accent-foreground: 280 80% 70%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 240 15% 95%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 240 30% 20%;
+    --input: 240 25% 16%;
+    --ring: 270 70% 60%;
 
     --radius: 0.5rem;
 
