@@ -151,6 +151,14 @@ const OuroFold = () => {
     setIsEditorOpen(true);
   };
 
+  const handleReorderIdeas = (reorderedIdeas: Idea[]) => {
+    setIdeas(reorderedIdeas);
+    toast({
+      title: "Ideas reordered",
+      description: "Your idea structure has been updated",
+    });
+  };
+
   const handleSaveIdea = (savedIdea: Idea) => {
     const parentId = (setEditingIdea as any).parentId;
     
@@ -207,6 +215,7 @@ const OuroFold = () => {
             onToggleExpand={handleToggleExpand}
             onAddChild={handleAddChild}
             onEdit={handleEditIdea}
+            onReorderIdeas={handleReorderIdeas}
           />
         ) : (
           <div className="container mx-auto px-6 py-8">

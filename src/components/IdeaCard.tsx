@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronRight, Plus, Edit3, Layers } from 'lucide-react';
+import { ChevronDown, ChevronRight, Plus, Edit3, Layers, GripVertical } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Draggable } from 'react-beautiful-dnd';
 
 export interface Idea {
   id: string;
@@ -21,9 +22,11 @@ interface IdeaCardProps {
   onAddChild: (parentId: string) => void;
   onEdit: (idea: Idea) => void;
   style?: React.CSSProperties;
+  index?: number;
+  isDragDisabled?: boolean;
 }
 
-export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: IdeaCardProps) => {
+export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style, index = 0, isDragDisabled = false }: IdeaCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleExpand = () => {
@@ -32,7 +35,7 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
     }
   };
 
-  return (
+  const CardContent = ({ isDragging = false }: { isDragging?: boolean }) => (
     <div 
       style={style}
       className="relative"
@@ -41,16 +44,22 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
     >
       <Card 
         className={cn(
-          "relative p-4 bg-card/90 backdrop-blur-sm border-border/50 transition-all duration-300",
-          "hover:shadow-[0_8px_32px_hsl(var(--primary)_/_0.3)] hover:border-primary/50",
+          "relative p-4 bg-card/90 backdrop-blur-sm border-border/50 transition-all duration-300 cursor-pointer select-none",
+          "hover:shadow-[0_8px_32px_hsl(var(--primary)_/_0.3)] hover:border-primary/50 hover:cursor-grab active:cursor-grabbing",
           "animate-fold-in",
-          isHovered && "animate-glow-pulse"
+          isHovered && "animate-glow-pulse",
+          isDragging && "shadow-2xl scale-105 rotate-1"
         )}
         style={{
           transformStyle: 'preserve-3d',
           marginLeft: `${idea.depth * 20}px`,
         }}
       >
+        {/* Drag handle */}
+        <div className="absolute left-1 top-2 opacity-30 hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing">
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+
         {/* Depth indicator line */}
         {idea.depth > 0 && (
           <div 
@@ -66,7 +75,10 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleExpand}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExpand();
+                }}
                 className={cn(
                   "h-6 w-6 p-0 hover:bg-primary/20",
                   idea.children.length === 0 && "invisible"
@@ -81,7 +93,13 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
               
               <div className="flex items-center gap-2">
                 <Layers className="h-4 w-4 text-primary opacity-60" />
-                <h3 className="font-semibold text-foreground text-lg">
+                <h3 
+                  className="font-semibold text-foreground text-lg cursor-pointer hover:text-primary transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(idea);
+                  }}
+                >
                   {idea.title}
                 </h3>
               </div>
@@ -89,7 +107,13 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
 
             {/* Content */}
             {idea.content && (
-              <p className="text-muted-foreground text-sm leading-relaxed pl-8">
+              <p 
+                className="text-muted-foreground text-sm leading-relaxed pl-8 cursor-pointer hover:text-foreground transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(idea);
+                }}
+              >
                 {idea.content}
               </p>
             )}
@@ -101,7 +125,7 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
                   <Badge 
                     key={index} 
                     variant="secondary" 
-                    className="text-xs bg-accent/50 hover:bg-accent/70 transition-colors"
+                    className="text-xs bg-accent/50 hover:bg-accent/70 transition-colors cursor-pointer"
                   >
                     {tag}
                   </Badge>
@@ -113,12 +137,15 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
           {/* Action buttons */}
           <div className={cn(
             "flex gap-1 transition-opacity duration-200",
-            isHovered ? "opacity-100" : "opacity-0"
+            isHovered ? "opacity-100" : "opacity-60"
           )}>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onEdit(idea)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(idea);
+              }}
               className="h-8 w-8 p-0 hover:bg-primary/20"
             >
               <Edit3 className="h-4 w-4" />
@@ -126,7 +153,10 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onAddChild(idea.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddChild(idea.id);
+              }}
               className="h-8 w-8 p-0 hover:bg-primary/20"
             >
               <Plus className="h-4 w-4" />
@@ -142,5 +172,23 @@ export const IdeaCard = ({ idea, onToggleExpand, onAddChild, onEdit, style }: Id
         )}
       </Card>
     </div>
+  );
+
+  if (isDragDisabled) {
+    return <CardContent />;
+  }
+
+  return (
+    <Draggable draggableId={idea.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          <CardContent isDragging={snapshot.isDragging} />
+        </div>
+      )}
+    </Draggable>
   );
 };
